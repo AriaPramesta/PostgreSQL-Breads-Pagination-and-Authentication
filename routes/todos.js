@@ -10,32 +10,43 @@ module.exports = function (db) {
       const offset = limit * (page - 1)
       const query = req.query;
 
-      let sql = `SELECT todos.id AS todo_id, todos.title, todos.deadline, todos.complete FROM todos LEFT JOIN users ON todos.userid = users.id WHERE users.id = ${req.session.user.id}`;
-      let sqlcount = `SELECT COUNT(*) AS total FROM todos WHERE userid = ${req.session.user.id}`;
-      let queries = [];
+      let baseCondition = `users.id = ${req.session.user.id}`
+      let filters = [];
 
       if (query.title) {
-        queries.push(`title ilike '%${query.title}%'`);
+        filters.push(`title ilike '%${query.title}%'`);
       }
 
       if (query.startdate && query.enddate) {
-        queries.push(
-          `birthdate BETWEEN '${query.startdate}' AND '${query.enddate}'`
+        filters.push(
+          `deadline BETWEEN '${query.startdate}' AND '${query.enddate}'`
         );
       } else if (query.startdate) {
-        queries.push(`birthdate >= '${query.startdate}'`);
+        filters.push(`deadline >= '${query.startdate}'`);
       } else if (query.enddate) {
-        queries.push(`birthdate <= '${query.enddate}'`);
+        filters.push(`deadline <= '${query.enddate}'`);
       }
 
-      if (query.married) {
-        queries.push(`married = ${query.married}`);
+      if (query.complete) {
+        filters.push(`complete = ${query.complete}`);
       }
+
+      const operation = query.operation === 'or' ? 'OR' : 'AND';
+
+      let whereClause = `WHERE ${baseCondition}`;
+      if (filters.length > 0) {
+        whereClause += ` AND (${filters.join(` ${operation} `)})`;
+      }
+
+      let sql = ` SELECT todos.id AS todo_id, todos.title, todos.deadline, todos.complete FROM todos LEFT JOIN users ON todos.userid = users.id ${whereClause} `;
+      let sqlcount = `SELECT COUNT(*) AS total FROM todos LEFT JOIN users ON todos.userid = users.id ${whereClause}`;
+
+      console.log("sql: ", sql)
 
       const todosCount = await db.query(sqlcount)
       const pages = Math.ceil(todosCount.rows[0].total / limit)
-
       const todos = await db.query(sql)
+
       res.render('todos/list', { page, pages, data: todos.rows, query: req.query, user: req.session.user })
       console.log("todo.rows: ", todos.rows)
     } catch (error) {
@@ -63,19 +74,17 @@ module.exports = function (db) {
     try {
       const id = req.params.id;
 
-      // Ambil data dari database
       const result = await db.query('SELECT * FROM todos WHERE id = $1 AND userid = $2', [
         id,
         req.session.user.id,
       ]);
 
-      // Cek apakah data ada
       if (result.rows.length === 0) {
         return res.status(404).send('Data tidak ditemukan atau tidak punya akses');
       }
 
       const item = result.rows[0]; // data yang akan diedit
-      res.render('todos/updateform', { item, user: req.session.user, formatDateToLocal }); // kirim ke view
+      res.render('todos/updateform', { item, user: req.session.user, formatDateToLocal });
     } catch (error) {
       console.error(error);
       res.send('Terjadi kesalahan saat mengambil data');
