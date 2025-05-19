@@ -4,17 +4,19 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 const { Pool } = require("pg");
+const session = require('express-session')
+
 
 const pool = new Pool({
   user: "pramesta",
   password: "pramestauser",
   hots: "localhost",
-  port: "5432",
+  port: 5432,
   database: "webtodo",
 });
 
 var indexRouter = require("./routes/index")(pool);
-var usersRouter = require("./routes/users");
+var todosRouter = require("./routes/todos")(pool);
 
 var app = express();
 
@@ -27,9 +29,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+app.use(session({
+  secret: 'aksarala',
+  resave: false,
+  saveUnitialized: false,
+}))
 
 app.use("/", indexRouter);
-app.use("/users", usersRouter);
+app.use("/todos", todosRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
