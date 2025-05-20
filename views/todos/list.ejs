@@ -66,13 +66,15 @@
             <label for="birthdate" class="col-sm-2 col-form-label">Deadline</label>
             <div class="col-sm-10 d-flex justify-content-between">
               <div class="col-sm-5">
-                <input type="date" step="0.1" class="form-control" id="deadline" name="startdate">
+                <input type="date" step="0.1" class="form-control" id="deadline" name="startdate"
+                  value="<%= query.startdate %>">
               </div>
               <div>
                 s.d
               </div>
               <div class="col-sm-5">
-                <input type="date" step="0.1" class="form-control" id="deadline" name="enddate">
+                <input type="date" step="0.1" class="form-control" id="deadline" name="enddate"
+                  value="<%= query.enddate %>">
               </div>
             </div>
           </div>
@@ -82,8 +84,8 @@
             <div class="col-sm-10">
               <select class="form-select" id="complete" name="complete">
                 <option value="" selected>-complete-</option>
-                <option value=true>Done</option>
-                <option value=false>Not Yet</option>
+                <option value='true' <%=query.complete=='true' ? 'selected' : '' %>>Done</option>
+                <option value='false' <%=query.complete=='false' ? 'selected' : '' %>>Not Yet</option>
               </select>
             </div>
           </div>
@@ -98,7 +100,8 @@
                 </label>
               </div>
               <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="operation" id="and" value="and">
+                <input class="form-check-input" type="radio" name="operation" id="and" value="and"
+                  <%=query.operation=='and' ? 'checked' : '' %>>
                 <label class="form-check-label" for="and">
                   AND
                 </label>
