@@ -5,7 +5,7 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 const { Pool } = require("pg");
 const session = require('express-session')
-
+var flash = require('connect-flash');
 
 const pool = new Pool({
   user: "pramesta",
@@ -34,6 +34,7 @@ app.use(session({
   resave: false,
   saveUnitialized: false,
 }))
+app.use(flash());
 
 app.use("/", indexRouter);
 app.use("/todos", todosRouter);

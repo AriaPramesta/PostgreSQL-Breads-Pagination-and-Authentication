@@ -4,7 +4,7 @@ var router = express.Router();
 
 module.exports = function (db) {
   router.get("/", function (req, res, next) {
-    res.render("login");
+    res.render("login", { errorMessage: req.flash('errorMessage') });
   });
 
   router.post('/login', function (req, res) {
@@ -13,13 +13,15 @@ module.exports = function (db) {
     db.query("SELECT * FROM users WHERE email = $1", [email]).then((data) => {
       console.log(data);
       if (data.rows.length == 0) {
-        res.send("email doesn't exist");
+        req.flash('errorMessage', "Email doesn't exist")
+        res.redirect("/")
       } else {
         if (comparePassword(password, data.rows[0].password)) {
           req.session.user = data.rows[0]
           res.redirect("/todos");
         } else {
-          res.send('wrong email or password')
+          req.flash('errorMessage', 'Wrong Email or Password!')
+          res.redirect("/")
         }
       }
     }).catch((e) => {
@@ -30,18 +32,22 @@ module.exports = function (db) {
 
 
   router.get("/register", function (req, res, next) {
-    res.render("register");
+    res.render("register", { errorMessage: req.flash('errorMessage') });
   });
 
   router.post("/register", function (req, res) {
     const { email, password, repassword } = req.body;
 
-    if (password !== repassword) return res.send("password doesn't match");
+    if (password !== repassword) {
+      req.flash('errorMessage', "Password doesn't match")
+      return res.redirect("/register")
+    }
 
     db.query("SELECT * FROM users WHERE email = $1", [email]).then((data) => {
       console.log(data);
       if (data.rows.length > 0) {
-        res.send("email already exist");
+        req.flash('errorMessage', 'Email already exist')
+        res.redirect("/register")
       } else {
         db.query("INSERT INTO users (email, password) VALUES ($1, $2) returning *", [
           email,
