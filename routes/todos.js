@@ -49,7 +49,7 @@ module.exports = function (db) {
       const todos = await db.query(sql)
       const url = req.url == "/" ? "/?page=1" : req.url;
 
-      res.render('todos/list', { page, pages, data: todos.rows, query: req.query, user: req.session.user, url })
+      res.render('todos/list', { page, pages, data: todos.rows, query: req.query, user: req.session.user, url, offset })
       console.log("todo.rows: ", todos.rows)
     } catch (error) {
       res.send("failed to load data")
