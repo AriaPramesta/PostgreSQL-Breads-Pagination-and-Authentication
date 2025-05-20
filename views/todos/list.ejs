@@ -49,7 +49,7 @@
 
       <div class="card-body">
         <form method="get" action="/todos">
-          <!-- <input type="hidden" name="page" value="1"> -->
+          <input type="hidden" name="page" value="1">
           <div class="row mb-3">
             <label for="title" class="col-sm-2 col-form-label">Title</label>
             <div class="col-sm-10">
@@ -157,21 +157,25 @@
           <ul class="pagination">
             <% if (page> 1) { %>
               <li class="page-item">
-                <a class="page-link" href="" aria-label="Previous">
+                <a class="page-link" href="/todos<%= url.replace(`page=${page}`, `page=${page - 1}`) %>"
+                  aria-label="Previous">
                   <span aria-hidden="true">&laquo;</span>
                 </a>
               </li>
               <% } %>
 
                 <% for (let i=1; i <=pages; i++) { %>
-                  <li class="page-item<%= page == i ? ' active' : '' %>"><a class="page-link" href="">
+                  <li class="page-item<%= page == i ? ' active' : '' %>"><a class="page-link"
+                      href="/todos<%= url.replace(`page=${page}`, `page=${i}`) %>">
                       <%= i %>
                     </a></li>
                   <% } %>
 
                     <% if (page < pages) { %>
                       <li class="page-item">
-                        <a class="page-link" href="" aria-label="Next">
+                        <a class="page-link"
+                          href="/todos<%= url.replace(`page=${page}`, `page=${parseInt(page) + 1}`) %>"
+                          aria-label="Next">
                           <span aria-hidden="true">&raquo;</span>
                         </a>
                       </li>

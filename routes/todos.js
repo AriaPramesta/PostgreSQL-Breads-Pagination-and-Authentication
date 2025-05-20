@@ -39,6 +39,7 @@ module.exports = function (db) {
       }
 
       let sql = ` SELECT todos.id AS todo_id, todos.title, todos.deadline, todos.complete FROM todos LEFT JOIN users ON todos.userid = users.id ${whereClause} `;
+      sql += ` limit ${limit} offset ${offset}`;
       let sqlcount = `SELECT COUNT(*) AS total FROM todos LEFT JOIN users ON todos.userid = users.id ${whereClause}`;
 
       console.log("sql: ", sql)
@@ -46,8 +47,9 @@ module.exports = function (db) {
       const todosCount = await db.query(sqlcount)
       const pages = Math.ceil(todosCount.rows[0].total / limit)
       const todos = await db.query(sql)
+      const url = req.url == "/" ? "/?page=1" : req.url;
 
-      res.render('todos/list', { page, pages, data: todos.rows, query: req.query, user: req.session.user })
+      res.render('todos/list', { page, pages, data: todos.rows, query: req.query, user: req.session.user, url })
       console.log("todo.rows: ", todos.rows)
     } catch (error) {
       res.send("failed to load data")
@@ -83,7 +85,7 @@ module.exports = function (db) {
         return res.status(404).send('Data tidak ditemukan atau tidak punya akses');
       }
 
-      const item = result.rows[0]; // data yang akan diedit
+      const item = result.rows[0];
       res.render('todos/updateform', { item, user: req.session.user, formatDateToLocal });
     } catch (error) {
       console.error(error);
