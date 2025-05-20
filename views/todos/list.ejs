@@ -9,6 +9,12 @@
     integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
   <link rel="stylesheet" href="/fontawesome/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    th a {
+      text-decoration: none;
+      color: black;
+    }
+  </style>
 </head>
 
 <body>
@@ -46,6 +52,8 @@
       <div class="card-body">
         <form method="get" action="/todos">
           <input type="hidden" name="page" value="1">
+          <input type="hidden" name="sortBy" value="deadline">
+          <input type="hidden" name="sortMode" value="asc">
           <div class="row mb-3">
             <label for="title" class="col-sm-2 col-form-label">Title</label>
             <div class="col-sm-10">
@@ -107,9 +115,18 @@
           <thead>
             <tr>
               <th>No.</th>
-              <th><i class="fa-solid fa-sort"></i> Title</th>
-              <th><i class="fa-solid fa-sort"></i> Complete</th>
-              <th><i class="fa-solid fa-sort"></i> Deadline</th>
+              <th><a
+                  href="/todos<%= url.replace(`sortBy=${sortBy}`, `sortBy=title`).replace(`sortMode=${sortMode}`, `sortMode=${sortMode == 'asc' ? 'desc' : 'asc'}`) %>"><i
+                    class="fa-solid fa-<%= sortBy == 'title' ? sortMode == 'asc' ? 'sort-up' : 'sort-down' : 'sort' %>"></i>
+                  Title</a></th>
+              <th><a
+                  href="/todos<%= url.replace(`sortBy=${sortBy}`, `sortBy=complete`).replace(`sortMode=${sortMode}`, `sortMode=${sortMode == 'asc' ? 'desc' : 'asc'}`) %>"><i
+                    class="fa-solid fa-<%= sortBy == 'complete' ? sortMode == 'asc' ? 'sort-up' : 'sort-down' : 'sort' %>"></i>
+                  Complete</a></th>
+              <th><a
+                  href="/todos<%= url.replace(`sortBy=${sortBy}`, `sortBy=deadline`).replace(`sortMode=${sortMode}`, `sortMode=${sortMode == 'asc' ? 'desc' : 'asc'}`) %>"><i
+                    class="fa-solid fa-<%= sortBy == 'deadline' ? sortMode == 'asc' ? 'sort-up' : 'sort-down' : 'sort' %>"></i>
+                  Deadline</a></th>
               <th>Actions</th>
             </tr>
           </thead>

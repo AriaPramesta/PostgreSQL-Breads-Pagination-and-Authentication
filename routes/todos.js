@@ -5,33 +5,32 @@ var router = express.Router();
 module.exports = function (db) {
   router.get('/', isLoggedIn, async function (req, res, next) {
     try {
-      const { page = 1 } = req.query
+      const { page = 1, title, startdate, enddate, complete, operation, sortMode = 'asc', sortBy = 'deadline' } = req.query
       const limit = 3
       const offset = limit * (page - 1)
-      const query = req.query;
 
       let baseCondition = `users.id = ${req.session.user.id}`
       let filters = [];
 
-      if (query.title) {
-        filters.push(`title ilike '%${query.title}%'`);
+      if (title) {
+        filters.push(`title ilike '%${title}%'`);
       }
 
-      if (query.startdate && query.enddate) {
+      if (startdate && enddate) {
         filters.push(
-          `deadline BETWEEN '${query.startdate}' AND '${query.enddate}'`
+          `deadline BETWEEN '${startdate}' AND '${enddate}'`
         );
-      } else if (query.startdate) {
-        filters.push(`deadline >= '${query.startdate}'`);
-      } else if (query.enddate) {
-        filters.push(`deadline <= '${query.enddate}'`);
+      } else if (startdate) {
+        filters.push(`deadline >= '${startdate}'`);
+      } else if (enddate) {
+        filters.push(`deadline <= '${enddate}'`);
       }
 
-      if (query.complete) {
-        filters.push(`complete = ${query.complete}`);
+      if (complete) {
+        filters.push(`complete = ${complete}`);
       }
 
-      const operation = query.operation === 'or' ? 'OR' : 'AND';
+      operation === 'or' ? 'OR' : 'AND';
 
       let whereClause = `WHERE ${baseCondition}`;
       if (filters.length > 0) {
@@ -39,7 +38,8 @@ module.exports = function (db) {
       }
 
       let sql = ` SELECT todos.id AS todo_id, todos.title, todos.deadline, todos.complete FROM todos LEFT JOIN users ON todos.userid = users.id ${whereClause} `;
-      sql += ` limit ${limit} offset ${offset}`;
+      sql += ` ORDER BY ${sortBy} ${sortMode}`
+      sql += ` LIMIT ${limit} OFFSET ${offset}`;
       let sqlcount = `SELECT COUNT(*) AS total FROM todos LEFT JOIN users ON todos.userid = users.id ${whereClause}`;
 
       console.log("sql: ", sql)
@@ -47,11 +47,12 @@ module.exports = function (db) {
       const todosCount = await db.query(sqlcount)
       const pages = Math.ceil(todosCount.rows[0].total / limit)
       const todos = await db.query(sql)
-      const url = req.url == "/" ? "/?page=1" : req.url;
+      const url = req.url == "/" ? `/?page=1&sortBy=${sortBy}&sortMode=${sortMode}` : req.url;
 
-      res.render('todos/list', { page, pages, data: todos.rows, query: req.query, user: req.session.user, url, offset })
+      res.render('todos/list', { page, pages, data: todos.rows, query: req.query, user: req.session.user, url, offset, sortBy, sortMode })
       console.log("todo.rows: ", todos.rows)
     } catch (error) {
+      console.log(error)
       res.send("failed to load data")
     }
 
