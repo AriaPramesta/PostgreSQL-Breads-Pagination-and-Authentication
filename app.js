@@ -6,6 +6,7 @@ var logger = require("morgan");
 const { Pool } = require("pg");
 const session = require('express-session')
 var flash = require('connect-flash');
+const fileUpload = require('express-fileupload');
 
 const pool = new Pool({
   user: "pramesta",
@@ -35,6 +36,7 @@ app.use(session({
   saveUnitialized: false,
 }))
 app.use(flash());
+app.use(fileUpload());
 
 app.use("/", indexRouter);
 app.use("/todos", todosRouter);
