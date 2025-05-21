@@ -19,12 +19,12 @@ module.exports = function (db) {
 
       if (startdate && enddate) {
         filters.push(
-          `deadline BETWEEN '${startdate}' AND '${enddate}'`
+          `deadline BETWEEN '${startdate}' AND '${enddate} 23:59:59'`
         );
       } else if (startdate) {
         filters.push(`deadline >= '${startdate}'`);
       } else if (enddate) {
-        filters.push(`deadline <= '${enddate}'`);
+        filters.push(`deadline <= '${enddate} 23:59:59'`);
       }
 
       if (complete) {
