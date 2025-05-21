@@ -73,7 +73,7 @@ module.exports = function (db) {
   })
 
   router.get("/users/avatar", isLoggedIn, function (req, res, next) {
-    res.render("avatar");
+    res.render("avatar", { avatar: req.session.user.avatar });
   });
 
   router.post("/users/avatar", function (req, res, next) {
