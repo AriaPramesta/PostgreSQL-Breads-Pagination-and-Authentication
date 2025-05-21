@@ -5,6 +5,7 @@ const path = require('path')
 
 module.exports = function (db) {
   router.get("/", function (req, res, next) {
+    if (req.session.user) return res.redirect("/todos");
     res.render("login", {
       errorMessage: req.flash('errorMessage'),
       successMessage: req.flash('successMessage')
@@ -36,6 +37,7 @@ module.exports = function (db) {
 
 
   router.get("/register", function (req, res, next) {
+    if (req.session.user) return res.redirect("/todos");
     res.render("register", {
       errorMessage: req.flash('errorMessage'),
       successMessage: req.flash('successMessage') // Tambahkan ini agar alert.ejs tidak error
@@ -75,6 +77,7 @@ module.exports = function (db) {
 
   router.get('/logout', function (req, res) {
     req.session.destroy(function () {
+      res.clearCookie('connect.sid');
       res.redirect('/')
     })
   })
