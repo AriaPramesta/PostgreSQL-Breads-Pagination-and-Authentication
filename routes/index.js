@@ -5,7 +5,10 @@ const path = require('path')
 
 module.exports = function (db) {
   router.get("/", function (req, res, next) {
-    res.render("login", { errorMessage: req.flash('errorMessage') });
+    res.render("login", {
+      errorMessage: req.flash('errorMessage'),
+      successMessage: req.flash('successMessage')
+    });
   });
 
   router.post('/login', function (req, res) {
@@ -33,7 +36,10 @@ module.exports = function (db) {
 
 
   router.get("/register", function (req, res, next) {
-    res.render("register", { errorMessage: req.flash('errorMessage') });
+    res.render("register", {
+      errorMessage: req.flash('errorMessage'),
+      successMessage: req.flash('successMessage') // Tambahkan ini agar alert.ejs tidak error
+    });
   });
 
   router.post("/register", function (req, res) {
@@ -55,7 +61,8 @@ module.exports = function (db) {
           generatePassword(password),
         ]).then((user) => {
           req.session.user = user.rows[0]
-          res.redirect("/todos");
+          req.flash('successMessage', 'Registration successful! Please login.');
+          res.redirect("/");
         }).catch((e) => {
           console.log(e);
           res.redirect("/");
