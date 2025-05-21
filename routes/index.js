@@ -1,6 +1,7 @@
 var express = require("express");
-const { generatePassword, comparePassword } = require("../helper/util");
+const { generatePassword, comparePassword, isLoggedIn } = require("../helper/util");
 var router = express.Router();
+const path = require('path')
 
 module.exports = function (db) {
   router.get("/", function (req, res, next) {
@@ -71,8 +72,33 @@ module.exports = function (db) {
     })
   })
 
-  router.get("/users/avatar", function (req, res, next) {
+  router.get("/users/avatar", isLoggedIn, function (req, res, next) {
     res.render("avatar");
+  });
+
+  router.post("/users/avatar", function (req, res, next) {
+    if (!req.files || Object.keys(req.files).length === 0) {
+      return res.status(400).send('No files were uploaded.');
+    }
+
+    // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
+    const avatar = req.files.avatar;
+    const fileName = `${Date.now()}-${avatar.name}`
+    const uploadPath = path.join(__dirname, '..', 'public', 'images', 'avatars', fileName);
+    console.log(uploadPath)
+
+    // Use the mv() method to place the file somewhere on your server
+    avatar.mv(uploadPath, function (err) {
+      if (err)
+        return res.status(500).send(err);
+      db.query("UPDATE users SET avatar = $1 WHERE id = $2", [fileName, req.session.user.id]).then(() => {
+        req.session.user.avatar = fileName
+        res.redirect('/todos')
+      }).catch((e) => {
+        console.log(e)
+        res.send("gagal mengubah avatar")
+      })
+    });
   });
 
   return router;

@@ -56,7 +56,7 @@
       <div class="card-header d-flex justify-content-between align-items-center">
         <div class="profile-email">
           <a href="/users/avatar">
-            <img src="/images/avatars/aksarala.png" alt="avatar" class="avatar-ar">
+            <img src="/images/avatars/<%= user.avatar || 'aksarala.png'%>" alt="avatar" class="avatar-ar">
           </a>
           <h2>
             <%= user.email %>
