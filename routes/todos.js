@@ -1,5 +1,5 @@
 var express = require('express');
-const { isLoggedIn, formatDateToLocal } = require('../helper/util');
+const { isLoggedIn, formatDateTime } = require('../helper/util');
 var router = express.Router();
 
 module.exports = function (db) {
@@ -49,7 +49,7 @@ module.exports = function (db) {
       const todos = await db.query(sql)
       const url = req.url == "/" ? `/?page=1&sortBy=${sortBy}&sortMode=${sortMode}` : req.url;
 
-      res.render('todos/list', { page, pages, data: todos.rows, query: req.query, user: req.session.user, url, offset, sortBy, sortMode })
+      res.render('todos/list', { page, pages, data: todos.rows, query: req.query, user: req.session.user, url, offset, sortBy, sortMode, formatDateTime })
       console.log("todo.rows: ", todos.rows)
     } catch (error) {
       console.log(error)
@@ -87,7 +87,7 @@ module.exports = function (db) {
       }
 
       const item = result.rows[0];
-      res.render('todos/updateform', { item, user: req.session.user, formatDateToLocal });
+      res.render('todos/updateform', { item, user: req.session.user, formatDateTime });
     } catch (error) {
       console.error(error);
       res.send('Terjadi kesalahan saat mengambil data');
