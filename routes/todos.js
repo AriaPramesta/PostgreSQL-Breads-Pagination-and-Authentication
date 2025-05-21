@@ -1,6 +1,7 @@
 var express = require('express');
 const { isLoggedIn, formatDateTime } = require('../helper/util');
 var router = express.Router();
+const moment = require('moment');
 
 module.exports = function (db) {
   router.get('/', isLoggedIn, async function (req, res, next) {
@@ -49,7 +50,7 @@ module.exports = function (db) {
       const todos = await db.query(sql)
       const url = req.url == "/" ? `/?page=1&sortBy=${sortBy}&sortMode=${sortMode}` : req.url;
 
-      res.render('todos/list', { page, pages, data: todos.rows, query: req.query, user: req.session.user, url, offset, sortBy, sortMode, formatDateTime })
+      res.render('todos/list', { page, pages, data: todos.rows, query: req.query, user: req.session.user, url, offset, sortBy, sortMode, moment })
       console.log("todo.rows: ", todos.rows)
     } catch (error) {
       console.log(error)
