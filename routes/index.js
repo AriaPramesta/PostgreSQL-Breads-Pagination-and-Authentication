@@ -71,5 +71,9 @@ module.exports = function (db) {
     })
   })
 
+  router.get("/users/avatar", function (req, res, next) {
+    res.render("avatar");
+  });
+
   return router;
 };
