@@ -3,7 +3,7 @@
 A simple TODO web app built with **Node.js**, **Express**, **PostgreSQL**, and **EJS**, featuring:
 
 - 🔒 User Authentication (Login & Register)
-- 📦 BREAD Operations (Browse, Read, Edit, Add, Delete)
+- 📦 BREADS Operations (Browse, Read, Edit, Add, Delete, Sort)
 - 📅 Deadline Filtering (with date range)
 - 🔁 Pagination
 - 📤 Avatar Upload with File Handling
